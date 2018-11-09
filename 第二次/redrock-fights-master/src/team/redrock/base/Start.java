@@ -1,5 +1,7 @@
 package team.redrock.base;
 
+import team.redrock.heros.SmallMonster;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -20,6 +22,8 @@ public class Start {
     private Stack<Hero> rank = new Stack<>();
     //舞台
     private Stage stage;
+    //
+    private boolean isAddOver = false;
 
     public Start() {
         load();
@@ -75,7 +79,10 @@ public class Start {
                             Hero hero = null;
                             try {
                                 hero = (Hero) clazz.newInstance();
-                                list.add(hero);
+                                if (hero.getSmall() == false) {
+                                    list.add(hero);
+
+                                }
                             } catch (InstantiationException e) {
                                 e.printStackTrace();
                             } catch (IllegalAccessException e) {
@@ -96,6 +103,30 @@ public class Start {
         //胜利者
         List<Hero> winners = new LinkedList<>();
 
+        //打小怪
+
+        if (isAddOver == false) {
+            for (int i = 0; i < list.size(); i++) {
+                Hero hero1 = list.get(i);
+                Hero hero2 = new SmallMonster();
+                int times = 10;//我要打十个
+                while (times > 0) {
+                    boolean winner = stage.battle(hero1, hero2);
+                    if (winner) {
+                        hero1.experience += hero2.giveExperience;
+                        hero1.levelUp();
+                    } else {
+                        hero2.experience += hero1.giveExperience;
+                        hero2.levelUp();
+                    }
+                    times--;
+                }
+
+            }
+        }
+
+
+        isAddOver = true;
         //如果这一轮的参战英雄数为奇数 第一个人轮空
         if (list.size() % 2 != 0) {
             winners.add(list.get(0));
@@ -112,9 +143,13 @@ public class Start {
             boolean winner = stage.battle(hero1, hero2);
             if (winner) {
                 winners.add(hero1);
+                hero1.experience += hero2.giveExperience;
+                hero1.levelUp();
                 rank.add(hero2);
             } else {
                 winners.add(hero2);
+                hero2.experience += hero1.giveExperience;
+                hero2.levelUp();
                 rank.add(hero1);
             }
         }
