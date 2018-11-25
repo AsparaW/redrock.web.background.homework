@@ -1,13 +1,19 @@
-import java.nio.charset.IllegalCharsetNameException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DBTool {
-    Connection con ;
+    Connection con;
     Statement statement;
     ResultSet rs;
 
+
+    public DBTool(Connection con) {
+        this.con = con;
+        try {
+            statement = con.createStatement();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public Connection getCon() {
         return con;
@@ -21,168 +27,174 @@ public class DBTool {
         return statement;
     }
 
-
-    public DBTool(Connection con){
-        this.con = con;
-        try {
-            statement = con.createStatement();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
     public void createTable() throws SQLException {
-        String sql = "create table if not exists department(id int,name varchar(100),cash int,primary key(id))";
+        String sql = "create table if not exists course(id varchar(100),name varchar(100),type varchar(10),status varchar(10),mode varchar(20),teacher varchar(20),info varchar(400),primary key(id))";
         statement.executeUpdate(sql);
-        sql = "create table if not exists manager(id int,name varchar(100),address varchar(100),contact varchar(100),primary key(id))";
-        statement.executeUpdate(sql);
-        sql = "create table if not exists employee(id int,name varchar(100),age int,address varchar(100),contact varchar(100),job varchar(100),primary key(id))";
-        statement.executeUpdate(sql);
-        sql = "create table if not exists goods(id int,name varchar(100),selling_price decimal(10,2),purchasing_price decimal(10,2),primary key(id))";
-        statement.executeUpdate(sql);
-        sql = "create table if not exists supplier(id int,name varchar(100),contact varchar(100),tel varchar(20),primary key(id))";
-        statement.executeUpdate(sql);
-        sql = "create table if not exists storage(id int,manager_name varchar(100),contact varchar(100),primary key(id))";
+        sql = "create table if not exists ctable(id int ,_time varchar(10),w1 varchar(100) not null,w2 varchar(100) not null,w3 varchar(100) not null,w4 varchar(100) not null,w5 varchar(100) not null,w6 varchar(100) not null,w7 varchar(100) not null)";
         statement.executeUpdate(sql);
         //CREATE OVER
-        // RELATIONSHIPS
-        sql = "create table if not exists depart_manager_relation(id int UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,department_id int,manager_id int,primary key(id))";
-        statement.executeUpdate(sql);
-        sql = "create table if not exists depart_employee_relation(id int UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,department_id int,employee_id int,primary key(id))";
-        statement.executeUpdate(sql);
-        sql = "create table if not exists depart_goods_relation(id int UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,department_id int,goods_id int,primary key(id))";
-        statement.executeUpdate(sql);
-        sql = "create table if not exists goods_supplier_relation(id int UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,goods_id int,supplier_id int,primary key(id))";
-        statement.executeUpdate(sql);
-        sql = "create table if not exists goods_storage_relation(id int UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,goods_id int,storage_id int,primary key(id))";
-        statement.executeUpdate(sql);
         // RELATIONS CREATE OVER
+        sql = "delete from course";
+        statement.executeUpdate(sql);
+        sql = "delete from ctable";
+        statement.executeUpdate(sql);
+        inittable();
     }
 
     // 建表
 
-    public void insertDepart(int id,String name,int cash) throws SQLException {
-        String sql1 = "insert into department(id,name,cash)" +"values(?,?,?)" ;
+    public void insertCourse(String id, String name, String type, String status, String mode, String teacher, String info) throws SQLException {
+        String sql1 = "insert into course(id,name,type,status,mode,teacher,info)" + "values(?,?,?,?,?,?,?)";
         PreparedStatement pre = con.prepareCall(sql1);
-        pre.setString(1,Integer.toString(id));
-        pre.setString(2,name);
-        pre.setString(3,Integer.toString(cash));
+        pre.setString(1, id);
+        pre.setString(2, name);
+        pre.setString(3, type);
+        pre.setString(4, status);
+        pre.setString(5, mode);
+        pre.setString(6, teacher);
+        pre.setString(7, info);
         pre.executeUpdate();
     }
 
-    public void insertManager(int id,String name,String contact,String address) throws SQLException {
-        String sql1 = "insert into manager(id,name,address,contact)" +"values(?,?,?,?)" ;
-        PreparedStatement pre = con.prepareCall(sql1);
-        pre.setString(1, Integer.toString(id));
-        pre.setString(2,name);
-        pre.setString(3,address);
-        pre.setString(4,contact);
-        pre.executeUpdate();
-    }
-    public void insertEmployee(int id,String name,int age,String address,String contact,String job) throws SQLException {
-        String sql1 = "insert into employee(id,name,age,address,contact,job)" +"values(?,?,?,?,?,?)" ;
-        PreparedStatement pre = con.prepareCall(sql1);
-        pre.setString(1,Integer.toString(id));
-        pre.setString(2,name);
-        pre.setString(3,Integer.toString(age));
-        pre.setString(4,address);
-        pre.setString(5,contact);
-        pre.setString(6,job);
-        pre.executeUpdate();
-    }
-    public void insertGoods(int id,String name,double sellingPrice,double purchasingPrice) throws SQLException {
-        String sql1 = "insert into goods(id,name,sellingPrice,purchasingPrice)" +"values(?,?,?,?)" ;
-        PreparedStatement pre = con.prepareCall(sql1);
-        pre.setString(1,Integer.toString(id));
-        pre.setString(2,name);
-        pre.setString(3,Double.toString(sellingPrice));
-        pre.setString(4,Double.toString(purchasingPrice));
-        pre.executeUpdate();
-    }
-    public void insertSupplier(int id,String name,String contact,String tel) throws SQLException {
-        String sql1 = "insert into supplier(id,name,contact,tel)" +"values(?,?,?,?)" ;
-        PreparedStatement pre = con.prepareCall(sql1);
-        pre.setString(1,Integer.toString(id));
-        pre.setString(2,name);
-        pre.setString(3,contact);
-        pre.setString(4,tel);
-        pre.executeUpdate();
-    }
-    public void insertStorage(int id,String manager_name,String contact) throws SQLException {
-        String sql1 = "insert into String(id,manager_name,contact)" +"values(?,?,?)" ;
-        PreparedStatement pre = con.prepareCall(sql1);
-        pre.setString(1,Integer.toString(id));
-        pre.setString(2,manager_name);
-        pre.setString(3,contact);
-        pre.executeUpdate();
-    }
+    public void inittable() throws SQLException {
+        for (int i = 1; i <= 6; i++) {
+            String sql = "insert into ctable(_time,id,w1,w2,w3,w4,w5,w6,w7)" + "values(?,?,?,?,?,?,?,?,?)";
+            PreparedStatement pre = con.prepareCall(sql);
+            String content = Integer.toString(i * 2 - 1) + "-" + Integer.toString(i * 2);
+            pre.setString(1, content);
+            pre.setInt(2, i);
+            pre.setString(3, "");
+            pre.setString(4, "");
+            pre.setString(5, "");
+            pre.setString(6, "");
+            pre.setString(7, "");
+            pre.setString(8, "");
+            pre.setString(9, "");
 
+            pre.executeUpdate();
+        }
 
-    public void departManagerRelation(int left,int right) throws SQLException {
-        String sql1 = "insert into depart_manager_relation(department_id,manager_id)" +"values(?,?)" ;
-        PreparedStatement pre = con.prepareCall(sql1);
-        pre.setString(1,Integer.toString(left));
-        pre.setString(2,Integer.toString(right));
-        pre.executeUpdate();
-    }
-
-    public void departEmployeeRelation(int left,int right) throws SQLException {
-        String sql1 = "insert into depart_employee_relation(department_id,employee_id)" +"values(?,?)" ;
-        PreparedStatement pre = con.prepareCall(sql1);
-        pre.setString(1,Integer.toString(left));
-        pre.setString(2,Integer.toString(right));
-        pre.executeUpdate();
-    }
-    public void departGoodsRelation(int left,int right) throws SQLException {
-        String sql1 = "insert into depart_goods_relation(department_id,goods_id)" +"values(?,?)" ;
-        PreparedStatement pre = con.prepareCall(sql1);
-        pre.setString(1,Integer.toString(left));
-        pre.setString(2,Integer.toString(right));
-        pre.executeUpdate();
-    }
-    public void goodsSupplierRelation(int left,int right) throws SQLException {
-        String sql1 = "insert into goods_supplier_relation(goods_id,supplier_id)" +"values(?,?)" ;
-        PreparedStatement pre = con.prepareCall(sql1);
-        pre.setString(1,Integer.toString(left));
-        pre.setString(2,Integer.toString(right));
-        pre.executeUpdate();
-    }
-    public void goodsStorageRelation(int left,int right) throws SQLException {
-        String sql1 = "insert into goods_storage_relation(goods_id,storage_id)" +"values(?,?)" ;
-        PreparedStatement pre = con.prepareCall(sql1);
-        pre.setString(1,Integer.toString(left));
-        pre.setString(2,Integer.toString(right));
-        pre.executeUpdate();
     }
     //插入数据
 
 
-    public void print(String dbname,String... argu) throws SQLException {
+    public void print(String dbname, String... argu) throws SQLException {
         int len = argu.length;
-        String info[]= new String[len];
-        if (len==  0){
+        String info[] = new String[len];
+        if (len == 0) {
             return;
         }
-        String sql ="select ";
-        for (int i= 0 ;  i<len;i++){
+        String sql = "select ";
+        for (int i = 0; i < len; i++) {
             sql = sql + argu[i];
-            if (i!=len-1){
+            if (i != len - 1) {
                 sql = sql + ",";
             }
         }
-        sql = sql +" from ?";
-        rs=statement.executeQuery(sql);
-        while (rs.next()){
-            for (int i = 0;i<len;i++){
-                info[i]= rs.getString(i);
+        sql = sql + " from ?";
+        PreparedStatement pre = con.prepareCall(sql);
+        pre.setString(1, dbname);
+        rs = pre.executeQuery();
+        while (rs.next()) {
+            for (int i = 0; i < len; i++) {
+                info[i] = rs.getString(i);
+                System.out.print(argu[i] + " = " + info[i] + "  ");
             }
-            System.out.println(info);
+//            System.out.println(info);
         }
     }
-    public void delete(int id,String dbName) throws SQLException {
-        String sql  = "delete from ? where id = ?";
+
+    public void print2(String dbName, int id) throws SQLException {
+        String sql = " select * from " + dbName + " where id = ? ";
         PreparedStatement pre = con.prepareCall(sql);
-        pre.setString(1,dbName);
-        pre.setString(2,Integer.toString(id));
-        statement.executeUpdate(sql);
+        pre.setInt(1, id);
+        rs = pre.executeQuery();
+        int con = rs.getMetaData().getColumnCount();
+        while (rs.next()) {
+            for (int i = 1; i <= con; i++) {
+                System.out.println(rs.getMetaData().getColumnName(i) + "    " + rs.getString(i) + "      ");
+            }
+        }
+    }
+
+
+    public void change(String dbName, int id, String toName, String tbName, boolean isReserve) throws SQLException {
+        String sql = "SELECT " + tbName + " FROM " + dbName + " WHERE id LIKE ?";
+        PreparedStatement pre = con.prepareCall(sql);
+        pre.setInt(1, id);
+        rs = pre.executeQuery();
+        String before = "";
+        while (rs.next()) {
+            before = rs.getString(tbName);
+        }
+        sql = "update " + dbName + " set " + tbName + " = ?  where id = ?";
+        pre = con.prepareCall(sql);
+        if (isReserve && !before.equals("")) {
+            toName = before + "," + toName;
+        }
+        pre.setString(1, toName);
+        pre.setInt(2, id);
+        pre.executeUpdate();
+    }
+
+
+    public void delete(int id, String dbName) throws SQLException {
+        System.out.println("删除" + dbName + " 里 id=" + id + "的项");
+        String sql = "delete from " + dbName + " where id = ?";
+        PreparedStatement pre = con.prepareCall(sql);
+        //pre.setString(1, dbName);
+        pre.setInt(1, id);
+        pre.executeUpdate();
+    }
+
+
+    public void search(String name, String dbName) throws SQLException {
+        System.out.println("在 " + dbName + " 里查询" + name + "项");
+        String sql = "SELECT id FROM " + dbName + " WHERE name LIKE ?";
+        PreparedStatement pre = con.prepareCall(sql);
+        pre.setString(1, name);
+        rs = pre.executeQuery();
+        if (rs.getMetaData().getColumnCount() == 0) {
+            System.out.println("未找到！");
+            return;
+        }
+        while (rs.next()) {
+            String id = rs.getString("id");
+            print2(dbName, Integer.parseInt(id));
+        }
+    }
+
+
+    public void search2(String name, String dbName) throws SQLException {
+        System.out.println("在 " + dbName + " 里模糊查询" + name + "项");
+        String sql = "SELECT * FROM " + dbName + " WHERE name LIKE \"%\"?\"%\"";
+        PreparedStatement pre = con.prepareCall(sql);
+        pre.setString(1, name);
+        rs = pre.executeQuery();
+        if (rs.getMetaData().getColumnCount() == 0) {
+            System.out.println("未找到！");
+            return;
+        }
+        while (rs.next()) {
+            System.out.println("ID: " + rs.getInt("id") + rs.getString("name"));
+        }
+    }
+
+    public void order(String dbName, String cName, boolean isAsc) throws SQLException {
+        String order = " desc";
+        if (isAsc) {
+            order = " asc";
+        }
+        String sql = "select * from " + dbName + " order by " + cName + order;
+        PreparedStatement pre = con.prepareCall(sql);
+        // pre.setString(1,cName);
+        System.out.println("按照" + cName + "  " + order + "排序");
+        rs = pre.executeQuery();
+        int con = rs.getMetaData().getColumnCount();
+        while (rs.next()) {
+            for (int i = 1; i <= con; i++) {
+                System.out.println(rs.getMetaData().getColumnName(i) + "    " + rs.getString(i) + "      ");
+            }
+        }
     }
 }
